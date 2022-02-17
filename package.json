@@ -1,0 +1,26 @@
+{
+  "name": "near-backend",
+  "version": "1.0.0",
+  "description": "Implementation of a server calling near smart contract",
+  "main": "server.js",
+  "scripts": {
+    "start": "env-cmd -f ./config/testnet-account.env node server.js",
+    "build": "node contract/compile.js",
+    "dev:deploy": "near dev-deploy contract/target/wasm32-unknown-unknown/release/near_backend.wasm && env-cmd -f ./neardev/dev-account.env node scripts/init.js",
+    "dev:build:deploy": "npm run build && rm -rf neardev && near dev-deploy contract/target/wasm32-unknown-unknown/release/near_backend.wasm && env-cmd -f ./neardev/dev-account.env node scripts/init.js",
+    "test": "env-cmd -f ./neardev/dev-account.env node scripts/test.js",
+    "deploy": "./scripts/deploy.testnet.sh"
+  },
+  "author": "SergantChe",
+  "license": "ISC",
+  "dependencies": {
+    "env-cmd": "^10.1.0",
+    "express": "^4.17.2",
+    "shelljs": "^0.8.5",
+    "tweetnacl": "^1.0.3",
+    "tweetnacl-util": "^0.15.1",
+    "cors": "^2.8.5",
+    "near-api-js": "^0.44.2",
+    "near-cli": "^3.1.0"
+  }
+}
