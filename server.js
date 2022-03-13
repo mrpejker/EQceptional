@@ -62,15 +62,17 @@ app.get("/", (req, res) => {
 });
 
 // Balance of a single player or list of NFT rewards
-app.get("/craft-hero", async (req, res) => {
+app.get("/craft-new-token", async (req, res) => {
   let result = "None";
-  const username = req.query.nearid.slice(1, -1);  
+  const username = req.query.nearid.slice(1, -1);
+  const token_type = req.query.tokentype.slice(1, -1);
+  console.log("Token type: ", token_type);
   const gas_cost = 300000000000000;
   const minting_cost = "100000000000000000000000";
-  console.log("Crafting new hero for ", username);
+  console.log("Crafting new token for ", username);
 
   result = await contract.new_token({
-      args: { username },
+      args: { username, token_type },
       gas: gas_cost,
       amount: minting_cost,
     })

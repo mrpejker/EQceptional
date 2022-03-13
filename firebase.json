@@ -10,7 +10,7 @@
       "source": "/hserver",
       "run": {
         "serviceId": "hserver",  // "service name" (from when you deployed the container image)
-        "region": "europe-west1"     // optional (if omitted, default is us-central1)
+        "region": "europe-west1" // optional (if omitted, default is us-central1)
       }
     } ]
   }

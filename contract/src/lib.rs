@@ -28,7 +28,7 @@ enum StorageKey {
 }
 
 //  tokentype
-#[derive(BorshSerialize, BorshDeserialize, Serialize, Deserialize)]
+#[derive(BorshSerialize, BorshDeserialize, Serialize, Deserialize, Debug, PartialEq)]
 #[serde(crate = "near_sdk::serde")]
 pub enum TokenType {
     Interest,
@@ -107,24 +107,18 @@ impl Contract {
 
     // Mint nft ans send them to `username` account
     #[payable]
-    pub fn new_token(&mut self, username: String) -> TokenId {
+    pub fn new_token(&mut self, username: String, token_type: String) -> TokenId {
         let timestamp: u64 = env::block_timestamp();
         let rand: u8 = *env::random_seed().get(0).unwrap();
         let token_id: String = format!("USER:{}:{}", rand, timestamp);
         log!("token id: {}", token_id.clone());
 
-        let contract_id = env::current_account_id();
-        let root_id = AccountId::try_from(contract_id).unwrap();
-        let media_url: String = format!("{}.png", token_id.clone());
-        let media_hash = Base64VecU8(env::sha256(media_url.as_bytes()));
-        log!("media url: {}", media_url.clone());
-
         // Default to common token
-        let token_metadata = TokenMetadata {
-            title: Some("Interest".to_string()),
-            description: Some("NFT token".to_string()),
-            media: Some(media_url),
-            media_hash: Some(media_hash),
+        let mut token_metadata = TokenMetadata {
+            title: None,
+            description: None,
+            media: None,
+            media_hash: None,
             copies: Some(1u64),
             issued_at: Some(timestamp.to_string()),
             expires_at: None,
@@ -135,7 +129,40 @@ impl Contract {
             reference_hash: None,
         };
 
-        // Mint NFT   
+        // Choose and set tokentype
+        let tokentype = match token_type.as_str() {
+            "interest" => {
+                token_metadata.title = Some("Interest".to_string());
+                token_metadata.description = Some("Interest NFT Description".to_string());
+                token_metadata.media = Some("interest.png".to_string());
+                Some(TokenType::Interest)
+            },
+            "joy" => {
+                token_metadata.title = Some("Joy".to_string());
+                token_metadata.description = Some("Joy NFT Description".to_string());
+                token_metadata.media = Some("motivation.png".to_string());
+                Some(TokenType::Joy)
+            },
+            "trust" => {
+                token_metadata.title = Some("Trust".to_string());
+                token_metadata.description = Some("Trust NFT Description".to_string());
+                token_metadata.media = Some("trust.png".to_string());
+                Some(TokenType::Trust)
+            },
+            "love" => {
+                token_metadata.title = Some("Love".to_string());
+                token_metadata.description = Some("Love NFT Description".to_string());
+                token_metadata.media = Some("commit.png".to_string());
+                Some(TokenType::Love)
+            },
+            _ => None,
+        };        
+        assert_ne!(tokentype, None, "Wrong token type parameter");
+        token_metadata.media_hash = Some(Base64VecU8(env::sha256(token_metadata.media.clone().unwrap().as_bytes())));
+
+        // Mint NFT 
+        let contract_id = env::current_account_id();
+        let root_id = AccountId::try_from(contract_id).unwrap();
         self.nft_mint(token_id.clone(), root_id.clone(), token_metadata.clone());
 
         // Transfer NFT to new owner
@@ -158,16 +185,8 @@ impl Contract {
         log!("Success! NFT transfering for {}! Token ID = {}", receiver_id.clone(), token_id.clone());
 
         // Init token stats
-        self.experience.insert(&token_id, &0);
-
-        // Choose and set tokentype
-        let tokentype = match rand {
-            0..=214 => TokenType::Interest,
-            215..=240 => TokenType::Joy,
-            241..=253 => TokenType::Trust,
-            254..=255 => TokenType::Love,
-        };
-        self.tokentype.insert(&token_id, &tokentype);
+        self.experience.insert(&token_id, &0);                
+        self.tokentype.insert(&token_id, &tokentype.unwrap());
 
         token_id
     }

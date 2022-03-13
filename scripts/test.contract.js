@@ -18,26 +18,31 @@ const main = async () => {
   console.log("Get total token supply and for meta_irony.testnet ...");
   sh.exec(`near view ${contractName} nft_total_supply`);
   sh.exec(
-    `near view ${contractName} nft_supply_for_owner '{"account_id": "sergantche.testnet"}'`
+    `near view ${contractName} nft_supply_for_owner '{"account_id": "meta_irony.testnet"}'`
   );
 
   // Mint and send nft
-  console.log("Try to craft a new hero ...");
+  console.log("Try to craft a new token");
   let res = await sh.exec(
-    `near call ${contractName} new_token '{"username": "sergantche.testnet"}' --deposit-yocto 9000000000000000000000 --account-id ${contractName} --gas 300000000000000`
+    `near call ${contractName} new_token '{"username": "meta_irony.testnet", "token_type": "joy"}' --deposit-yocto 9000000000000000000000 --account-id ${contractName} --gas 300000000000000`
   );
   const tokenId = getResult(res);
 
-  // Get new hero statistics
-  console.log("Try to get hero stats ...");
-  sh.exec(`near view ${contractName} get_stats '{"token_id": "${tokenId}"}'`);
-
-  // Update hero statistics and get data again
-  console.log("Try to update hero stats ...");
+  sh.exec(`near view ${contractName} nft_total_supply`);
   sh.exec(
-    `near call ${contractName} update_user_stats '{"token_id": "${tokenId}", "new_stars": 5, "new_experience": 6, "new_maximum_level": 7}' --account-id ${contractName} --gas 30000000000000`
+    `near view ${contractName} nft_supply_for_owner '{"account_id": "meta_irony.testnet"}'`
   );
-  sh.exec(`near view ${contractName} get_stats '{"token_id": "${tokenId}"}'`);
+
+  // // Get new hero statistics
+  // console.log("Try to get hero stats ...");
+  // sh.exec(`near view ${contractName} get_stats '{"token_id": "${tokenId}"}'`);
+
+  // // Update hero statistics and get data again
+  // console.log("Try to update hero stats ...");
+  // sh.exec(
+  //   `near call ${contractName} update_user_stats '{"token_id": "${tokenId}", "new_stars": 5, "new_experience": 6, "new_maximum_level": 7}' --account-id ${contractName} --gas 30000000000000`
+  // );
+  // sh.exec(`near view ${contractName} get_stats '{"token_id": "${tokenId}"}'`);
 
   // Exit script with the same code as the build command
   process.exit();
