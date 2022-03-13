@@ -15,7 +15,7 @@ const main = async () => {
     fs.readFileSync("./neardev/dev-account").toString();
 
   // Get token supply
-  console.log("Get total token supply and for sergantche.testnet ...");
+  console.log("Get total token supply and for meta_irony.testnet ...");
   sh.exec(`near view ${contractName} nft_total_supply`);
   sh.exec(
     `near view ${contractName} nft_supply_for_owner '{"account_id": "sergantche.testnet"}'`
@@ -24,7 +24,7 @@ const main = async () => {
   // Mint and send nft
   console.log("Try to craft a new hero ...");
   let res = await sh.exec(
-    `near call ${contractName} craft_new_hero '{"username": "sergantche.testnet"}' --deposit-yocto 9000000000000000000000 --account-id ${contractName} --gas 300000000000000`
+    `near call ${contractName} new_token '{"username": "sergantche.testnet"}' --deposit-yocto 9000000000000000000000 --account-id ${contractName} --gas 300000000000000`
   );
   const tokenId = getResult(res);
 
@@ -35,7 +35,7 @@ const main = async () => {
   // Update hero statistics and get data again
   console.log("Try to update hero stats ...");
   sh.exec(
-    `near call ${contractName} update_hero_stats '{"token_id": "${tokenId}", "new_stars": 5, "new_experience": 6, "new_maximum_level": 7}' --account-id ${contractName} --gas 30000000000000`
+    `near call ${contractName} update_user_stats '{"token_id": "${tokenId}", "new_stars": 5, "new_experience": 6, "new_maximum_level": 7}' --account-id ${contractName} --gas 30000000000000`
   );
   sh.exec(`near view ${contractName} get_stats '{"token_id": "${tokenId}"}'`);
 

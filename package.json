@@ -11,9 +11,11 @@
     "dev:deploy": "rm -rf neardev && near dev-deploy contract/target/wasm32-unknown-unknown/release/near_backend.wasm && env-cmd -f ./neardev/dev-account.env node scripts/init.js",
     "dev:build:deploy": "npm run build && rm -rf neardev && near dev-deploy contract/target/wasm32-unknown-unknown/release/near_backend.wasm && env-cmd -f ./neardev/dev-account.env node scripts/init.js",
     "test": "env-cmd -f ./neardev/dev-account.env node scripts/test.contract.js",
-    "deploy": "./scripts/deploy.testnet.sh"
+    "deploy": "./deploy.sh",
+    "gcloudbs": "gcloud builds submit --tag gcr.io/eqceptional-eaeab/hserver", 
+    "gcloudrun":"gcloud run deploy --image gcr.io/eqceptional-eaeab/hserver"
   },
-  "author": "SergantChe",
+  "author": "Meta_Irony",
   "license": "ISC",
   "dependencies": {
     "env-cmd": "^10.1.0",

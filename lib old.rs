@@ -18,8 +18,10 @@ pub use constants::{BASE_URL, DATA_IMAGE_SVG_NEAR_ICON, ONE_NEAR, ONE_YOCTO, SIN
 
 #[derive(BorshSerialize, BorshStorageKey)]
 enum StorageKey {
+    Stars,
     Experience,
-    TokenType,
+    MaximumLevel,
+    Rarity,
     NonFungibleToken,
     Metadata,
     TokenMetadata,
@@ -27,14 +29,14 @@ enum StorageKey {
     Approval,
 }
 
-//  tokentype
+// Token rarity
 #[derive(BorshSerialize, BorshDeserialize, Serialize, Deserialize)]
 #[serde(crate = "near_sdk::serde")]
-pub enum TokenType {
-    Interest,
-    Joy,
-    Trust,
-    Love
+pub enum Rarity {
+    Common,
+    Rare,
+    Epic,
+    Ssr
 }
 
 #[near_bindgen]
@@ -44,8 +46,10 @@ pub struct Contract {
     // NFT implementation
     tokens: NonFungibleToken,
     metadata: LazyOption<NFTContractMetadata>,
+    stars: LookupMap<TokenId, u64>,
     experience: LookupMap<TokenId, u64>,
-    tokentype: LookupMap<TokenId, TokenType>,
+    maximum_level: LookupMap<TokenId, u64>,
+    rarity: LookupMap<TokenId, Rarity>,
 }
 
 #[near_bindgen]
@@ -59,8 +63,8 @@ impl Contract {
 
         let metadata = NFTContractMetadata {
             spec: NFT_METADATA_SPEC.to_string(),
-            name: "EQceptional earned NFT".to_string(),
-            symbol: "EQ".to_string(),
+            name: "Murkwood Tale's hero NFT".to_string(),
+            symbol: "CRTHR".to_string(),
             icon: Some(DATA_IMAGE_SVG_NEAR_ICON.to_string()),
             base_uri: Some(BASE_URL.to_string()),
             reference: None,
@@ -78,8 +82,10 @@ impl Contract {
                 Some(StorageKey::Approval),
             ),
             metadata: LazyOption::new(StorageKey::Metadata, Some(&metadata)),
+            stars: LookupMap::new(StorageKey::Stars),
             experience: LookupMap::new(StorageKey::Experience),
-            tokentype: LookupMap::new(StorageKey::TokenType),
+            maximum_level: LookupMap::new(StorageKey::MaximumLevel),
+            rarity: LookupMap::new(StorageKey::Rarity),
         }                
     }
 
@@ -95,14 +101,16 @@ impl Contract {
         return rand;
     }
 
-    // Update user statistics
-    pub fn update_user_stats(&mut self, token_id: TokenId , new_experience: u64) {
+    // Update hero statistics
+    pub fn update_user_stats(&mut self, token_id: TokenId , new_stars: u64, new_experience: u64, new_maximum_level: u64) {
+        self.stars.insert(&token_id, &new_stars);
         self.experience.insert(&token_id, &new_experience);
+        self.maximum_level.insert(&token_id, &new_maximum_level);
     }
 
     // Get statistics of a hero
-    pub fn get_stats(&self, token_id: TokenId) -> ( Option<u64>, Option<TokenType>) {
-        (self.experience.get(&token_id), self.tokentype.get(&token_id))
+    pub fn get_stats(&self, token_id: TokenId) -> (Option<u64>, Option<u64>, Option<u64>, Option<Rarity>) {
+        (self.stars.get(&token_id), self.experience.get(&token_id), self.maximum_level.get(&token_id), self.rarity.get(&token_id))
     }
 
     // Mint nft ans send them to `username` account
@@ -110,7 +118,7 @@ impl Contract {
     pub fn new_token(&mut self, username: String) -> TokenId {
         let timestamp: u64 = env::block_timestamp();
         let rand: u8 = *env::random_seed().get(0).unwrap();
-        let token_id: String = format!("USER:{}:{}", rand, timestamp);
+        let token_id: String = format!("HERO:{}:{}", rand, timestamp);
         log!("token id: {}", token_id.clone());
 
         let contract_id = env::current_account_id();
@@ -121,7 +129,7 @@ impl Contract {
 
         // Default to common token
         let token_metadata = TokenMetadata {
-            title: Some("Interest".to_string()),
+            title: Some("Common".to_string()),
             description: Some("NFT token".to_string()),
             media: Some(media_url),
             media_hash: Some(media_hash),
@@ -158,16 +166,18 @@ impl Contract {
         log!("Success! NFT transfering for {}! Token ID = {}", receiver_id.clone(), token_id.clone());
 
         // Init token stats
+        self.stars.insert(&token_id, &0);
         self.experience.insert(&token_id, &0);
+        self.maximum_level.insert(&token_id, &0);
 
-        // Choose and set tokentype
-        let tokentype = match rand {
-            0..=214 => TokenType::Interest,
-            215..=240 => TokenType::Joy,
-            241..=253 => TokenType::Trust,
-            254..=255 => TokenType::Love,
+        // Choose and set rarity
+        let rarity = match rand {
+            0..=214 => Rarity::Common,
+            215..=240 => Rarity::Rare,
+            241..=253 => Rarity::Epic,
+            254..=255 => Rarity::Ssr,
         };
-        self.tokentype.insert(&token_id, &tokentype);
+        self.rarity.insert(&token_id, &rarity);
 
         token_id
     }

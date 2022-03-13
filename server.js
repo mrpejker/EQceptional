@@ -14,7 +14,7 @@ const port = process.env.PORT || 8080;
 const nearConfig = getConfig(process.env.APP_ENV || "development");
 const { nodeUrl, networkId, contractName } = nearConfig;
 const contractMethods = {
-  changeMethods: ["craft_new_hero", "update_hero_stats"],
+  changeMethods: ["new_token", "update_user_stats"],
   viewMethods: ["get_stats"],
 };
 
@@ -58,7 +58,7 @@ const contract = new Contract(contractAccount, contractName, contractMethods);
 
 ///   API   ///
 app.get("/", (req, res) => {
-  res.send("Hello from Murkwood Tale's contract server!");
+  res.send("Hello from EQceptional' contract server!");
 });
 
 // Balance of a single player or list of NFT rewards
@@ -69,7 +69,7 @@ app.get("/craft-hero", async (req, res) => {
   const minting_cost = "100000000000000000000000";
   console.log("Crafting new hero for ", username);
 
-  result = await contract.craft_new_hero({
+  result = await contract.new_token({
       args: { username },
       gas: gas_cost,
       amount: minting_cost,

@@ -37,8 +37,23 @@ yarn dev:server
 ```bash
 yarn test:server
 ```
+yarn start
+### run the server
 
 ### HTTPS Endpoints
 
 1. GET / => "Hello"
 1. GET /craft-hero?nearid=<> => {} Mints NFT for specified account
+
+### Firebase
+1. Set up:
+```bash
+firebase init
+```
+2. Deploy static files:
+```bash
+firebase deploy
+```
+3. Hosting: 
+https://eqceptional-eaeab.web.app
+

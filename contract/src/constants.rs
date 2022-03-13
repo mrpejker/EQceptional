@@ -1,6 +1,6 @@
 use near_sdk::{ Gas, Balance };
 
-pub const BASE_URI: &str = "https://murkwoodtale.web.app";
+pub const BASE_URL: &str = "https://eqceptional-eaeab.web.app";
 
 // Prepaid gas for making a single simple call.
 pub const SINGLE_CALL_GAS: Gas = Gas(200000000000000);
