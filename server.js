@@ -65,7 +65,12 @@ app.get("/", (req, res) => {
 app.get("/craft-new-token", async (req, res) => {
   let result = "None";
   const username = req.query.nearid.slice(1, -1);
-  const token_type = req.query.tokentype.slice(1, -1);
+  let token_type = "None";
+  if (req.query.tokentype == 0) token_type = "interest";
+  if (req.query.tokentype == 1) token_type = "joy";
+  if (req.query.tokentype == 2) token_type = "trust";
+  if (req.query.tokentype == 3) token_type = "love";
+
   console.log("Token type: ", token_type);
   const gas_cost = 300000000000000;
   const minting_cost = "100000000000000000000000";
@@ -78,11 +83,11 @@ app.get("/craft-new-token", async (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      res.status(200).send();
+      res.status(200).send(false); // False on any failure
     });
   console.log(result);
 
-  res.json(result);
+  res.status(200).send(true); // True on success
 });
 
 app.listen(port, () => {
