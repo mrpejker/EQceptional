@@ -1,4 +1,7 @@
 ## EQCeptional
+Hello and welcome to the backend repository for EQceptional app! 
+Our application is built with Unity and serves as emotional interlligence trainers. 
+This part of the project supports the NFT rewards issuance for achivements through app interaction.  The demo version requires signing in through NEAR testnet account on which users can receive their prizes. 
 
 ### Local development
 
